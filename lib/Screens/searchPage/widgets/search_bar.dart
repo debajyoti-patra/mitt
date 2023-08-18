@@ -33,13 +33,11 @@ class CustomSearchBar extends StatelessWidget {
           SizedBox(
             width: 200.w,
             child: TextFormField(
-              // controller: searchController,
               onFieldSubmitted: (value) {
                 context.read<SearchCubit>().getSearchMovie(value);
               },
               style: TextStyle(
-                  decorationThickness: 0,
-                  color: kScaffoldBackgroundColor),
+                  decorationThickness: 0, color: kScaffoldBackgroundColor),
               decoration: const InputDecoration(
                 border: InputBorder.none,
               ),

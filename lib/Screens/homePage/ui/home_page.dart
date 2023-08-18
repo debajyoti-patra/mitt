@@ -6,12 +6,13 @@ import 'package:mitt_assignment/Screens/favoritesPage/cubit/favorites_cubit.dart
 import 'package:mitt_assignment/Screens/favoritesPage/ui/favorites_page.dart';
 import 'package:mitt_assignment/Screens/homePage/cubit/home_cubit.dart';
 import 'package:mitt_assignment/Screens/searchPage/ui/search_page.dart';
+import 'package:mitt_assignment/Utils/colors.dart';
 import '../../../Utils/constants.dart';
 import '../../searchPage/cubit/search_cubit.dart';
 import '../../Widgets/movies_tile.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -42,7 +43,9 @@ class _HomePageState extends State<HomePage> {
                       child: FavoritesPage(),
                     ),
                   ),
-                );
+                ).then((value) {
+                  setState(() {});
+                });
               },
               child: const ListTile(
                 leading: Icon(Icons.favorite),
@@ -51,7 +54,7 @@ class _HomePageState extends State<HomePage> {
                   fontSize: 18,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -60,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 20.w),
+            padding: EdgeInsets.only(right: 0.w),
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -68,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => BlocProvider(
                       create: (context) => SearchCubit(),
-                      child: SearchPage(),
+                      child: const SearchPage(),
                     ),
                   ),
                 );
@@ -78,6 +81,32 @@ class _HomePageState extends State<HomePage> {
                 size: 30.w,
               ),
             ),
+          ),
+          PopupMenuButton(
+            color: kLight,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: () => context.read<HomeCubit>().sortByRating(),
+                child: CustomText(
+                  text: 'By Rating',
+                  color: kDark,
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () => context.read<HomeCubit>().sortByPopularity(),
+                child: CustomText(
+                  text: 'By Popularity',
+                  color: kDark,
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () => context.read<HomeCubit>().sortByYear(),
+                child: CustomText(
+                  text: 'By Year',
+                  color: kDark,
+                ),
+              )
+            ],
           ),
         ],
         leading: SizedBox(
@@ -101,7 +130,7 @@ class _HomePageState extends State<HomePage> {
         listener: (context, state) {},
         builder: (context, state) {
           if (state is HomeLodingState) {
-            print('state');
+            
             return const Center(
               child: CircularProgressIndicator(color: Colors.white),
             );
@@ -111,25 +140,24 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(
                     height: height * 0.90.h,
-                    child: MoviesTile(resultMovies: state.movies),
+                    child: BlocBuilder<HomeCubit, HomeState>(
+                      builder: (context, state) {
+                        if (state is HomeLodingState) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (state is HomeLodedState) {
+                          return MoviesTile(
+                            state: state,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
             );
-            
-          } 
-          else if (state is HomeFavoriteAddedState) {
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.90.h,
-                    child: MoviesTile(resultMovies: state.movies),
-                  ),
-                ],
-              ),
-            );
-            
           } else {
             return Container();
           }

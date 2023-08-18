@@ -22,11 +22,5 @@ class HomeLodedState extends HomeState {
   List<Object> get props => [movies];
   HomeLodedState({required this.movies});
 }
-class HomeFavoriteAddedState extends HomeState {
- 
-  List<MovieModel> movies;
-   
-  @override
-  List<Object> get props => [movies];
-  HomeFavoriteAddedState({required this.movies});
-}
+
+

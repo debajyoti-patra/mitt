@@ -1,5 +1,6 @@
-
+import 'package:flutter/foundation.dart';
 import 'package:mitt_assignment/Model/movie_model.dart';
+import 'package:mitt_assignment/Repositories/data.dart';
 import 'package:tmdb_api/tmdb_api.dart';
 import '../Utils/constants.dart';
 
@@ -12,21 +13,43 @@ final tmdbWithCustomLogs = TMDB(
 );
 
 Future<List<MovieModel>> getData() async {
-  final response = await tmdbWithCustomLogs.v3.movies.getTopRated();
+  try{
+    final response = await tmdbWithCustomLogs.v3.movies.getTopRated();
   List<MovieModel> list = [];
   for (var value in response['results']) {
-    list.add(MovieModel.fromMap(value));
+    if (favoriteMovies.any((element) => element.id == value['id'] as int)) {
+      list.add(MovieModel.fromMap(value).copyWith(isChecked: true));
+    } else {
+      list.add(MovieModel.fromMap(value));
+    }
   }
   final movies = list;
   return movies;
+  }catch(e){
+    if (kDebugMode) {
+      print(e);
+    }
+  }
+  return [];
 }
- Future<List<MovieModel>> getSingleData(String movieName) async {
+
+Future<List<MovieModel>> getSingleData(String movieName) async {
+  try {
     final response = await tmdbWithCustomLogs.v3.search.queryMovies(movieName);
     List<MovieModel> list = [];
-    for(var value in response['results']){
-      list.add(MovieModel.fromJson(value));
+    for (var value in response['results']) {
+      if (favoriteMovies.any((element) => element.id == value['id'] as int)) {
+        list.add(MovieModel.fromMap(value).copyWith(isChecked: true));
+      } else {
+        list.add(MovieModel.fromMap(value));
+      }
     }
     final searchMovie = list;
-    
     return searchMovie;
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
+    return [];
   }
+}
